@@ -1,0 +1,26 @@
+import fs from "fs";
+import ErrorHandler from "../middlewares/error.js";
+export const streamDownload = async(filePath, res, originalName)=>{
+    try {
+        if(!fs.existsSync(filePath)){
+            throw new ErrorHandler("file not found",404)
+        }
+        res.download(filePath,originalName,(err)=>{
+            if(err){
+                throw new ErrorHandler("Error dowmloading file",500)
+            }
+        })
+    } catch (error) {
+        if(error instanceof ErrorHandler ){
+            return res.status(err.statusCode).json({
+                success:true,
+                error:error.message
+            })
+        }
+        return res.status(500).json({
+            success:false,
+            error:"error streaming file"
+        })
+        
+    }
+}
